@@ -1,0 +1,24 @@
+name: Release
+
+on:
+  push:
+    paths: ['code/**', 'README.md']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: 打包 Pixel Bender 着色器
+        run: |
+          zip -j fractal3D-pixelbender.zip code/MandelbulbQuick3.pbk code/MandelbulbQuick4.pbk README.md
+      - name: 发布 Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TAG="v$(date +%Y.%m.%d)"
+          gh release create "$TAG" fractal3D-pixelbender.zip --title "fractal3D $TAG" --generate-notes --clobber
